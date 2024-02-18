@@ -73,7 +73,7 @@ class XMLObject():
     def _text(self, l):
         s = ''
         for _ in range(l//2):
-            s += struct.unpack('s', self.binary_stream(2)[:1])[0].decode(encoding='utf-8')
+            s += struct.unpack('s', self.binary_stream(2)[:1])[0].decode(encoding='iso-8859-1')
         
         return s
     
