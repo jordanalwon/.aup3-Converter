@@ -29,7 +29,7 @@ class Converter():
                 if wavetrack['rate'] != rate:
                     raise ValueError("Different Samplerates!")
         
-        return rate
+        return int(rate)
     
     def _sampleformt(self, format_id):
         if format_id == 262159:
@@ -38,11 +38,11 @@ class Converter():
             raise ValueError('Unknown sample format!')
     
     def export_audio(self, file):
-        rate = self._get_rate()
+        rate = self._rate()
         wavetracks = []
         for channel in self.xml['project']['wavetrack']:
             waveblocks = []
-            sampleformat = self._get_formt(channel['sampleformat'])
+            sampleformat = self._sampleformt(channel['sampleformat'])
             for waveblock in channel['waveclip']['sequence']['waveblock']:
                 binary_block = self.file.binary_sammpleblock(waveblock['blockid'])
                 waveblocks.append(np.frombuffer(binary_block, dtype=sampleformat))
