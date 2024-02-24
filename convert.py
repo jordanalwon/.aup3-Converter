@@ -4,6 +4,7 @@ from name_space import NameSpace
 from xml_object import XMLObject
 import numpy as np
 import soundfile as sf
+from tqdm import tqdm
 
 class Converter():
     def __init__(self, path):
@@ -46,7 +47,7 @@ class Converter():
         channels = self._channels()
         sampleformat = self._sampleformat(self.xml['project']['wavetrack'][0]['sampleformat'])
         blocks = len(self.xml['project']['wavetrack'][0]['waveclip']['sequence']['waveblock'])
-        with sf.SoundFile(file, mode='w', samplerate=rate, channels=channels) as soundfile:
+        with sf.SoundFile(file, mode='w', samplerate=rate, channels=channels) as soundfile, tqdm(total=blocks*channels, desc="export audio") as pbar:
             for idx in range(blocks):
                 c_data = []
                 for c in range(channels):
