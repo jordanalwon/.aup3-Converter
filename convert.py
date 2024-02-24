@@ -59,10 +59,10 @@ class Converter():
                 soundfile.buffer_write(o_data, dtype=sampleformat['soundfile'])
         return
     
-    def export_label(self, file):
+    def export_label(self, file, sign_digits=6):
         with open(file, 'w') as f:
             for label in self.xml['project']['labeltrack']['label']:
-                f.write(f"{label['t']:.8f}\t{label['t1']:.8f}\t{label['title']}\n")
+                f.write(f"{label['t']:.{sign_digits}f}\t{label['t1']:.{sign_digits}f}\t{label['title']}\n")
         return
 
 if __name__ == "__main__":
