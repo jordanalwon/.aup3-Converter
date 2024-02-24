@@ -31,26 +31,31 @@ class Converter():
         
         return int(rate)
     
-    def _sampleformt(self, format_id):
+    def _sampleformat(self, format_id):
         if format_id == 262159:
-            return '<f4'
+            return {'numpy':'<f4',
+                    'soundfile': 'float32'}
         else:
             raise ValueError('Unknown sample format!')
     
+    def _channels(self):
+        return len(self.xml['project']['wavetrack'])
+    
     def export_audio(self, file):
         rate = self._rate()
-        wavetracks = []
-        for channel in self.xml['project']['wavetrack']:
-            waveblocks = []
-            sampleformat = self._sampleformt(channel['sampleformat'])
-            for waveblock in channel['waveclip']['sequence']['waveblock']:
-                binary_block = self.file.binary_sammpleblock(waveblock['blockid'])
-                waveblocks.append(np.frombuffer(binary_block, dtype=sampleformat))
-
-            wavetracks.append(np.concatenate(waveblocks))
-        audio = np.stack(wavetracks, axis=1)
-
-        sf.write(file, audio, rate)
+        channels = self._channels()
+        sampleformat = self._sampleformat(self.xml['project']['wavetrack'][0]['sampleformat'])
+        blocks = len(self.xml['project']['wavetrack'][0]['waveclip']['sequence']['waveblock'])
+        with sf.SoundFile(file, mode='w', samplerate=rate, channels=channels) as soundfile:
+            for idx in range(blocks):
+                c_data = []
+                for c in range(channels):
+                    block_id = self.xml['project']['wavetrack'][c]['waveclip']['sequence']['waveblock'][idx]['blockid']
+                    binary_block = self.file.binary_sammpleblock(block_id)
+                    c_data.append(np.frombuffer(binary_block, dtype=sampleformat['numpy']))
+                    pbar.update()
+                o_data = np.stack(c_data, axis=1)
+                soundfile.buffer_write(o_data, dtype=sampleformat['soundfile'])
         return
     
     def export_label(self, file):
