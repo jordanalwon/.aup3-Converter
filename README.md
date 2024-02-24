@@ -5,7 +5,10 @@
 (c) 2024, Jordan Alwon
 
 ## Installation
-*.aup3-Converter* depends on the Python packages NumPy and Soundfile.
+*.aup3-Converter* has following dependencies:
+- Numpy
+- Soundfile
+- tqdm
 
 ## Export Data
 ```python
