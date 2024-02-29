@@ -1,7 +1,7 @@
-from reader import SQLite3Reader
-from binary_stream import BinaryStream
-from name_space import NameSpace
-from xml_object import XMLObject
+from .reader import SQLite3Reader
+from .binary_stream import BinaryStream
+from .name_space import NameSpace
+from .xml_object import XMLObject
 import numpy as np
 import soundfile as sf
 from tqdm import tqdm
@@ -42,6 +42,9 @@ class Converter():
     def _channels(self):
         return len(self.xml['project']['wavetrack'])
     
+    def labels(self):
+        return self.xml['project']['labeltrack']
+    
     def export_audio(self, file):
         rate = self._rate()
         channels = self._channels()
@@ -61,7 +64,7 @@ class Converter():
     
     def export_label(self, file, sign_digits=6):
         with open(file, 'w') as f:
-            for label in self.xml['project']['labeltrack']['label']:
+            for label in self.labels['label']:
                 f.write(f"{label['t']:.{sign_digits}f}\t{label['t1']:.{sign_digits}f}\t{label['title']}\n")
         return
 
