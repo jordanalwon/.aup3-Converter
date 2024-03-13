@@ -43,7 +43,10 @@ class Converter():
         return len(self.xml['project']['wavetrack'])
     
     def labels(self):
-        return self.xml['project']['labeltrack']
+        if 'labeltrack' in self.xml['project'].keys():
+            return self.xml['project']['labeltrack']
+        else:
+            return None
     
     def export_audio(self, file):
         rate = self._rate()
