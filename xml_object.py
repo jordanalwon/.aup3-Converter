@@ -4,6 +4,7 @@ class XMLObject():
     def __init__(self, binary_stream, object_names):
         self.binary_stream = binary_stream
         self.object_names = object_names
+        self.string_block_size = self.object_names['string_block_size']
 
         while bool(self.binary_stream):
             indecator = self._indecator()
@@ -71,8 +72,8 @@ class XMLObject():
         return self._integer()
     def _text(self, l):
         s = ''
-        for _ in range(l//2):
-            s += struct.unpack('s', self.binary_stream(2)[:1])[0].decode(encoding='iso-8859-1')
+        for _ in range(l//self.string_block_size):
+            s += struct.unpack('s', self.binary_stream(self.string_block_size)[:1])[0].decode(encoding='iso-8859-1')
         
         return s
     

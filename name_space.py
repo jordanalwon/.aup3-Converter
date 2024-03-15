@@ -9,6 +9,7 @@ class NameSpace():
         self.binary_stream(1)
 
         self.string_block_size = self._indecator()
+        self.name_space['string_block_size'] = self.string_block_size
 
         while bool(self.binary_stream):
             indecator = self._indecator()
