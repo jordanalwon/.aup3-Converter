@@ -37,5 +37,5 @@ class NameSpace():
     def _text(self, l):
         s = ''
         for _ in range(l//self.string_block_size):
-            s += struct.unpack('s', self.binary_stream(self.string_block_size)[:1])[0].decode(encoding='utf-8')   # TODO why are string blocks 4 chars long and not 2? 2. file char as indecator?
+            s += struct.unpack('s', self.binary_stream(self.string_block_size)[:1])[0].decode(encoding='utf-8')
         return s
