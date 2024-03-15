@@ -5,8 +5,10 @@ class NameSpace():
         self.binary_stream = binary_stream
         self.name_space = {}
 
-        # Skip unkown start sequence
-        self.binary_stream(2)
+        # Skip start element
+        self.binary_stream(1)
+
+        self.string_block_size = self._indecator()
 
         while bool(self.binary_stream):
             indecator = self._indecator()
@@ -34,6 +36,6 @@ class NameSpace():
     
     def _text(self, l):
         s = ''
-        for _ in range(l//2):
-            s += struct.unpack('s', self.binary_stream(2)[:1])[0].decode(encoding='utf-8')   
+        for _ in range(l//self.string_block_size):
+            s += struct.unpack('s', self.binary_stream(self.string_block_size)[:1])[0].decode(encoding='utf-8')   # TODO why are string blocks 4 chars long and not 2? 2. file char as indecator?
         return s
