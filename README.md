@@ -17,3 +17,10 @@ converter = Converter(path)
 converter.export_audio('export.wav')
 converter.export_label("export.txt")
 ```
+
+## Roadmap to v1.0
+- [ ] Add Testframework
+- [ ] Integrate Tests to Github CI
+- [ ] Complete Docstring
+- [ ] Generate Documentation from docstring
+- [ ] Create C/C++ file reader to speed up the process
