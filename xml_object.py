@@ -4,61 +4,61 @@ class XMLObject():
     def __init__(self, binary_stream, object_names):
         self.binary_stream = binary_stream
         self.object_names = object_names
+        self.string_block_size = self.object_names['string_block_size']
 
         while bool(self.binary_stream):
             indecator = self._indecator()
 
-            match indecator:
-                case 1:
-                    obj_name = self._object_name()
-                    if hasattr(self, obj_name):
-                        if type(getattr(self, obj_name)) == list:
-                            getattr(self,obj_name).append(XMLObject(self.binary_stream, self.object_names))
-                        else:
-                            setattr(self, obj_name, [getattr(self,obj_name),XMLObject(self.binary_stream, self.object_names)])
+            if indecator ==  1:
+                obj_name = self._object_name()
+                if hasattr(self, obj_name):
+                    if type(getattr(self, obj_name)) == list:
+                        getattr(self,obj_name).append(XMLObject(self.binary_stream, self.object_names))
                     else:
-                        setattr(self, obj_name, XMLObject(self.binary_stream, self.object_names))
-                case 2:
-                    self.binary_stream(2)
-                    break
-                case 3:
-                    obj_name = self._object_name()
-                    text = self._text(self._block_length())
-                    setattr(self, obj_name, text)
-                case 4:
-                    obj_name = self._object_name()
-                    value = self._integer()
-                    setattr(self, obj_name, value)
-                case 5:
-                    obj_name = self._object_name()
-                    boolean = self._bool()
-                    setattr(self, obj_name, boolean)
-                case 6:
-                    obj_name = self._object_name()
-                    value = self._integer()
-                    setattr(self,obj_name, value)
-                case 7:
-                    obj_name = self._object_name()
-                    long = self._long_long()
-                    setattr(self, obj_name, long)
-                case 8:
-                    obj_name = self._object_name()
-                    value = self._integer()
-                    setattr(self, obj_name, value)
-                case 10:
-                    obj_name = self._object_name()
-                    value = self._double()
-                    setattr(self, obj_name, value)
-                    self.binary_stream(4) # Skip unknown sequence (FFFF) TODO
-                case 12:
-                    obj_name = "head"
-                    text = self._text(self._block_length())
-                    if hasattr(self,obj_name):
-                        self.head += text
-                    else:
-                        setattr(self,obj_name, text)
-                case _:
-                    raise ValueError("Unknown Indecator!")
+                        setattr(self, obj_name, [getattr(self,obj_name),XMLObject(self.binary_stream, self.object_names)])
+                else:
+                    setattr(self, obj_name, XMLObject(self.binary_stream, self.object_names))
+            elif indecator == 2:
+                self.binary_stream(2)
+                break
+            elif indecator == 3:
+                obj_name = self._object_name()
+                text = self._text(self._block_length())
+                setattr(self, obj_name, text)
+            elif indecator == 4:
+                obj_name = self._object_name()
+                value = self._integer()
+                setattr(self, obj_name, value)
+            elif indecator == 5:
+                obj_name = self._object_name()
+                boolean = self._bool()
+                setattr(self, obj_name, boolean)
+            elif indecator == 6:
+                obj_name = self._object_name()
+                value = self._integer()
+                setattr(self,obj_name, value)
+            elif indecator == 7:
+                obj_name = self._object_name()
+                long = self._long_long()
+                setattr(self, obj_name, long)
+            elif indecator == 8:
+                obj_name = self._object_name()
+                value = self._integer()
+                setattr(self, obj_name, value)
+            elif indecator == 10:
+                obj_name = self._object_name()
+                value = self._double()
+                setattr(self, obj_name, value)
+                self.binary_stream(4) # Skip unknown sequence (FFFF) TODO
+            elif indecator == 12:
+                obj_name = "head"
+                text = self._text(self._block_length())
+                if hasattr(self,obj_name):
+                    self.head += text
+                else:
+                    setattr(self,obj_name, text)
+            else:
+                raise ValueError("Unknown Indecator!")
 
     def _indecator(self):
         return struct.unpack('B', self.binary_stream(1))[0]
@@ -72,8 +72,8 @@ class XMLObject():
         return self._integer()
     def _text(self, l):
         s = ''
-        for _ in range(l//2):
-            s += struct.unpack('s', self.binary_stream(2)[:1])[0].decode(encoding='iso-8859-1')
+        for _ in range(l//self.string_block_size):
+            s += struct.unpack('s', self.binary_stream(self.string_block_size)[:1])[0].decode(encoding='iso-8859-1')
         
         return s
     
